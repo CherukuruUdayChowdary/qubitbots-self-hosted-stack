@@ -1,0 +1,13 @@
+services:
+  whatsapp-webjs:
+    build: .
+    container_name: whatsapp-webjs
+    env_file: .env
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - wa-auth:/app/.wwebjs_auth
+    shm_size: "1gb"
+    restart: unless-stopped
+volumes:
+  wa-auth:

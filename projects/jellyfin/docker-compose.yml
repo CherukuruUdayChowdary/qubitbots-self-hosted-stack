@@ -1,0 +1,17 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "127.0.0.1:8096:8096"
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - ./media:/media
+      - type: bind
+        source: /mnt/r2media
+        target: /media/R2
+        read_only: true
+        bind:
+          propagation: rslave
+    restart: unless-stopped

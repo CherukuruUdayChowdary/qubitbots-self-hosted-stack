@@ -1,0 +1,17 @@
+services:
+  hermes:
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes
+    command: ["gateway", "run"]
+    volumes:
+      - ./data:/opt/data
+    restart: unless-stopped
+    networks:
+      - default
+      - openwa-network
+      - paperless-mcp-network
+networks:
+  openwa-network:
+    external: true
+  paperless-mcp-network:
+    external: true

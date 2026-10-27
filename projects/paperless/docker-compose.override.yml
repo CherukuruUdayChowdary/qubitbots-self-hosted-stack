@@ -1,0 +1,15 @@
+services:
+  mcp:
+    image: docker.io/library/node:24-alpine
+    container_name: paperless-mcp
+    restart: unless-stopped
+    depends_on:
+      - webserver
+    env_file: mcp.env
+    command: ["npx", "-y", "paperless-ngx-mcp@3.2.1", "--http", "--port", "3000"]
+    networks:
+      - default
+      - paperless-mcp
+networks:
+  paperless-mcp:
+    name: paperless-mcp-network

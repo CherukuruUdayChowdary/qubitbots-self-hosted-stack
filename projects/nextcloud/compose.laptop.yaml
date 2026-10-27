@@ -1,0 +1,66 @@
+services:
+  db:
+    image: mariadb:lts
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD="<PLACEHOLDER>"
+      - MYSQL_PASSWORD="<PLACEHOLDER>"
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+
+  redis:
+    image: redis:alpine
+    restart: always
+
+  app:
+    image: nextcloud
+    restart: always
+    ports:
+      - 8080:80
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      - MYSQL_PASSWORD="<PLACEHOLDER>"
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_HOST=db
+
+  collabora:
+    image: collabora/code
+    restart: always
+    privileged: true
+    ports:
+      - 9980:9980
+    environment:
+      - aliasgroup1=http://app:80,http://localhost:8080,http://192.168.1.33:8080
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=false
+    cap_add:
+      - MKNOD
+      - SYS_ADMIN
+    networks:
+      default:
+        aliases:
+          - office.local
+
+  onlyoffice:
+    image: onlyoffice/documentserver
+    restart: always
+    ports:
+      - 8088:80
+    environment:
+      - JWT_ENABLED=true
+      - JWT_SECRET="<PLACEHOLDER>"
+      - ALLOW_PRIVATE_IP_ADDRESS=true
+    volumes:
+      - onlyoffice_data:/var/www/onlyoffice/Data
+
+volumes:
+  nextcloud:
+  db:
+  onlyoffice_data:

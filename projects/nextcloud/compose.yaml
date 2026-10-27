@@ -1,0 +1,32 @@
+services:
+  db:
+    image: mariadb:lts
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED
+    env_file: .env
+    environment:
+      - MARIADB_AUTO_UPGRADE=1
+    volumes:
+      - ./db:/var/lib/mysql
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+
+  app:
+    image: nextcloud:34
+    restart: unless-stopped
+    depends_on: [db, redis]
+    env_file: .env
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./app:/var/www/html
+
+  cron:
+    image: nextcloud:34
+    restart: unless-stopped
+    depends_on: [db, redis]
+    entrypoint: /cron.sh
+    volumes:
+      - ./app:/var/www/html
